@@ -1,0 +1,5 @@
+User1,File A and B or C were accessed
+User2,File A was accessed
+User3,File D was accessed
+User1,File A was accessed twice
+User1,All three files were accessed

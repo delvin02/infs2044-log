@@ -1,0 +1,7 @@
+FileA==0,File A was not accessed
+FileA<1,File A was not accessed
+FileA>1,File A was accessed twice
+FileA>0 and FileB>0 and FileC>0,All three files were accessed
+FileA>0 and (FileB>0 or FileC>0),File A and B or C were accessed
+FileD>0,File D was accessed
+FileA>0,File A was accessed

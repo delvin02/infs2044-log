@@ -1,0 +1,9 @@
+User1:
+    All three files were accessed
+    File A and B or C were accessed
+    File A was accessed
+    File A was accessed twice
+User2:
+    File A was accessed
+User3:
+    File D was accessed
