@@ -1,57 +1,64 @@
 from safeeval import SafeEval
 import re
 
-def load_patterns(pattern_path) -> list:
-    patterns = []
-    with open(pattern_path, 'r') as file:
-        for line in file:
-            condition, description = line.strip().split(',', maxsplit=1)
+class PatternMatcher:
+    """Class to handle loading patterns and matching them to user statistics."""
+    
+    def __init__(self, pattern_path):
+        self.pattern_path = pattern_path
+        self.patterns = list()
 
-            patterns.append({
-                'condition': condition,
-                'description': description
-            })
+    def load_patterns(self):
+        """Loads patterns from the file."""
+        self.patterns = []
+        with open(self.pattern_path, 'r') as file:
+            for line in file:
+                condition, description = line.strip().split(',', maxsplit=1)
 
-    return patterns
-
-def match_patterns(user_stats, patterns):
-    """
-    Matches users against patterns by evaluating conditions.
-    Returns a list of matches in the format:
-    [{'user_id': ..., 'message': ...}, ...], sorted by priority per user.
-    """
-    matches = []
-    safe_eval = SafeEval()
-
-    for user_id, stats in user_stats.items():
-        file_access_counts = stats['file_access_counts']
-
-        for pattern in patterns:
-            condition = pattern['condition']
-            description = pattern['description']
-
-            files_in_condition = extract_files_from_condition(condition)
-
-            if not any(file in file_access_counts for file in files_in_condition):
-                continue 
-
-            if safe_eval.safeEval(condition, file_access_counts):
-                matches.append({
-                    'user_id': user_id,
-                    'message': description
+                self.patterns.append({
+                    'condition': condition,
+                    'description': description
                 })
 
-    return matches
+        return self.patterns
 
-def extract_files_from_condition(condition: str) -> set:
-    """
-    Extracts file references (e.g., FileA, FileB) from a condition string.
-    Returns a set of file names found in the condition.
-    """
+    def match(self, user_stats):
+        """Matches patterns against the user statistics."""
+        matches = []
+        safe_eval = SafeEval()
+
+        for user_id, stats in user_stats.items():
+            file_access_counts = stats['file_access_counts']
+
+            for pattern in self.patterns:
+                condition = pattern['condition']
+                description = pattern['description']
+
+                files_in_condition = self.__extract_files_from_condition(condition)
+
+                # skip processing if the user does not have any record accessing the file
+                if not any(file in file_access_counts for file in files_in_condition):
+                    continue 
+
+                if safe_eval.safeEval(condition, file_access_counts):
+                    matches.append({
+                        'user_id': user_id,
+                        'message': description
+                    })
+
+        return matches
     
-    # Assuming file references are like 'FileA', 'FileB', etc.
-    # This regex looks for words starting with 'File' followed by a letter or number.
-    file_pattern = r'\bFile[A-Z0-9]+\b'
-    
-    # Find all file references in the condition
-    return set(re.findall(file_pattern, condition))
+    def __extract_files_from_condition(self, condition: str) -> set:
+        """
+        Extracts file references (e.g., FileA, FileB) from a condition string.
+        Returns a set of file names found in the condition.
+        """
+
+        # Assuming file references are like 'FileA', 'FileB', etc.
+        # This regex looks for words starting with 'File' followed by a letter or number.
+        file_pattern = r'\bFile[A-Z0-9]+\b'
+        
+        # Find all file references in the condition
+        return set(re.findall(file_pattern, condition))
+
+

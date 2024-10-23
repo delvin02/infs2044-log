@@ -1,8 +1,8 @@
 import click
-from log_parser import parse_log_file
-from output_formatter import generate_output
-from user_statistics import compute_user_statistics
-from patterns import match_patterns, load_patterns
+from log_parser import LogParser
+from output_formatter import OutputGenerator
+from user_statistics import UserStatistics
+from patterns import PatternMatcher
 OUTPUT_FORMATS = ['basic','grouped']
 
 #
@@ -21,27 +21,34 @@ def main(format, pattern_path, log_path):
     #TODO add some of your code here
     # Remember to structure and package your code and tests appropriately.
     # Don't just add _all_ your code here.
-    
-    # Step 1: Parse the log file
-    log_entries = parse_log_file(log_path)
-    if not log_entries:
-        click.echo("No valid log entries found.")
-        return
+    try:
+        # Step 1: Parse the log file
+        log_parser = LogParser(log_path)
+        log_entries = log_parser.parse()
+        if not log_entries:
+            click.echo("No valid log entries found.")
+            return
 
-    # Step 2: Compute user statistics
-    user_stats = compute_user_statistics(log_entries)
+        # Step 2: Compute user statistics
+        user_stats_computer = UserStatistics(log_entries)
+        user_stats = user_stats_computer.compute()
+        print(user_stats)
+        # Step 3: Load patterns
+        pattern_matcher = PatternMatcher(pattern_path)
+        patterns = pattern_matcher.load_patterns()
+        if not patterns:
+            click.echo("No patterns loaded")
+            return 
+        
+        # Step 4: Match patterns
+        matches = pattern_matcher.match(user_stats)
 
-    # Step 3: Load patterns
-    patterns = load_patterns(pattern_path)
-    if not patterns:
-        click.echo("No patterns loaded")
-        return 
-    
-    # Step 4: Match patterns
-    matches = match_patterns(user_stats, patterns)
+        # Step 5: Generate output
+        output_generator = OutputGenerator(matches, format)
+        output_generator.generate()
 
-    # Step 5: Generate output
-    generate_output(matches, format)
+    except ValueError as e:
+        click.echo(str(e))
     
 
 if __name__ == '__main__':

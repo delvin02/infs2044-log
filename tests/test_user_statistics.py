@@ -1,5 +1,5 @@
 import pytest
-from user_statistics import compute_user_statistics
+from user_statistics import UserStatistics
 
 def test_compute_user_statistics():
     # sample log entries as input
@@ -13,7 +13,8 @@ def test_compute_user_statistics():
     ]
     
     # Compute the statistics
-    stats = compute_user_statistics(log_entries)
+    user_stats_computer = UserStatistics(log_entries)
+    user_stats = user_stats_computer.compute()
     
     # Verify the computed statistics
     expected = {
@@ -31,4 +32,4 @@ def test_compute_user_statistics():
         }
     }
     
-    assert stats == expected
+    assert user_stats == expected

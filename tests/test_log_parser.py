@@ -1,5 +1,5 @@
 from io import StringIO
-from log_parser import parse_log_file
+from log_parser import LogParser
 
 def test_parse_log_file(monkeypatch):
     # Mock the content of the log.csv file
@@ -14,7 +14,8 @@ User1,FileC"""
     monkeypatch.setattr('builtins.open', lambda f, mode: StringIO(log_content))
     
     # Parse the log file
-    log_entries = parse_log_file("log.csv")
+    log_parser = LogParser("log.csv")
+    log_entries = log_parser.parse()
     
     # Verify the parsed log entries
     expected = [

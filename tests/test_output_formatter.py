@@ -1,6 +1,6 @@
 
 import pytest
-from output_formatter import generate_output
+from output_formatter import OutputGenerator
 
 def test_generate_output_basic(capsys):
     # Sample matches
@@ -12,7 +12,8 @@ def test_generate_output_basic(capsys):
     ]
     
     # Generate basic output
-    generate_output(matches, 'basic')
+    output_generator = OutputGenerator(matches, 'basic')
+    output_generator.generate()
     
     # Capture the output
     captured = capsys.readouterr()
@@ -31,8 +32,9 @@ def test_generate_output_grouped(capsys):
     ]
     
     # Generate grouped output
-    generate_output(matches, 'grouped')
-    
+    output_generator = OutputGenerator(matches, 'grouped')
+    output_generator.generate()
+
     # Capture the output
     captured = capsys.readouterr()
     
