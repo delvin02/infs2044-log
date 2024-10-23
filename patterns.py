@@ -1,19 +1,9 @@
 from safeeval import SafeEval
-from collections import defaultdict
 import re
-# define pattern priority for sorting
-pattern_priority = {
-    'File A and B or C were accessed': 1,
-    'File A was accessed': 2,
-    'File A was accessed twice': 4,
-    'File D was accessed': 3,
-    'All three files were accessed': 6
-}
 
 def load_patterns(pattern_path) -> list:
     patterns = []
     with open(pattern_path, 'r') as file:
-        next(file)
         for line in file:
             condition, description = line.strip().split(',', maxsplit=1)
 
@@ -40,24 +30,28 @@ def match_patterns(user_stats, patterns):
             condition = pattern['condition']
             description = pattern['description']
 
-            # Extract the file names from the condition using regex
-            file_names_in_condition = re.findall(r'\bFile\w+\b', condition)
+            files_in_condition = extract_files_from_condition(condition)
 
-            # Ensure all file names in the condition are in file_access_counts
-            if not all(file in file_access_counts for file in file_names_in_condition):
-                continue  # Skip condition if the user hasn't accessed the required files
+            if not any(file in file_access_counts for file in files_in_condition):
+                continue 
 
-            # Evaluate the condition
             if safe_eval.safeEval(condition, file_access_counts):
                 matches.append({
                     'user_id': user_id,
                     'message': description
                 })
 
-    # Sort all matches globally by pattern priority
-    sorted_matches = sorted(
-        matches,
-        key=lambda match: pattern_priority.get(match['message'], float('inf'))
-    )
+    return matches
 
-    return sorted_matches
+def extract_files_from_condition(condition: str) -> set:
+    """
+    Extracts file references (e.g., FileA, FileB) from a condition string.
+    Returns a set of file names found in the condition.
+    """
+    
+    # Assuming file references are like 'FileA', 'FileB', etc.
+    # This regex looks for words starting with 'File' followed by a letter or number.
+    file_pattern = r'\bFile[A-Z0-9]+\b'
+    
+    # Find all file references in the condition
+    return set(re.findall(file_pattern, condition))

@@ -23,11 +23,8 @@ def test_load_patterns(monkeypatch):
         {'condition': 'FileD>0', 'description': 'File D was accessed'}
     ]
     
-    # Sort both patterns and expected results by 'condition'
-    patterns_sorted = sorted(patterns, key=lambda x: x['condition'])
-    expected_sorted = sorted(expected, key=lambda x: x['condition'])
 
-    assert patterns_sorted == expected_sorted
+    assert patterns == expected
 
 def test_generate_output_basic(capsys):
     # Sample matches
@@ -64,5 +61,5 @@ def test_generate_output_grouped(capsys):
     captured = capsys.readouterr()
     
     # Verify the output
-    expected_output = "User1:\n    File A was accessed\n    All three files were accessed\n\nUser2:\n    File A was accessed\n\nUser3:\n    File D was accessed\n\n"
+    expected_output = "User1:\n    File A was accessed\n    All three files were accessed\nUser2:\n    File A was accessed\nUser3:\n    File D was accessed\n"
     assert captured.out == expected_output

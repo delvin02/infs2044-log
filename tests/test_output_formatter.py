@@ -37,5 +37,5 @@ def test_generate_output_grouped(capsys):
     captured = capsys.readouterr()
     
     # Verify the output
-    expected_output = "User1:\n    File A was accessed\n    All three files were accessed\n\nUser2:\n    File A was accessed\n\nUser3:\n    File D was accessed\n\n"
+    expected_output = "User1:\n    File A was accessed\n    All three files were accessed\nUser2:\n    File A was accessed\nUser3:\n    File D was accessed\n"
     assert captured.out == expected_output

@@ -40,4 +40,3 @@ def output_grouped(matches):
         print(f"{user_id}:")
         for message in messages:
             print(f"    {message}")
-        print()
